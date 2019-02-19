@@ -117,3 +117,35 @@ class Solution:
         result, area = self.halfLargestArea(heights, area)
         return result
 
+
+'''
+递增栈: 从stack[i+1]往左边扫描，第一个比height[stack[i+1]]小的数字的下标就是stack[i]
+所以可以推出height[stack[i]]<height[j], for j in (stack[i], stack[i+1]]
+进一步能推出height[stack[i]]<height[j]，for j in (stack[i], stack[-1]]
+同时因为height[stack[i]]<height[j]，for j in (stack[i-1], stack[i]]，
+所以包含stack[i]的最大矩形就是(stack[i-1], stack[-1]]，在程序里stack[-1] = i - 1
+高度是height[stack[i]]
+60 ms, 9.1 MB
+'''
+class Solution:
+    def largestRectangleArea(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        l = len(heights)
+        if l == 0:
+            return 0
+        if len(set(heights)) == 1:
+            return l * heights[0]
+        heights.append(0)
+        stack = [-1]
+        ans = 0
+        for i in range(len(heights)):
+            while heights[i] < heights[stack[-1]]:
+                t = stack[-1]
+                h = heights[stack.pop()]
+                w = i - stack[-1] - 1
+                ans = max(ans, h * w)
+            stack.append(i)
+        return ans
