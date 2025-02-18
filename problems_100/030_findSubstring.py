@@ -22,6 +22,57 @@
 !!!!!注意这个例子是与题目矛盾的，题目说的是一些长度相同的单词 words！！！
 '''
 
+'''
+以下方法仅适用于words里面的单词长度一样，非递归求解，76 ms
+'''
+class Solution:
+    def findSubstring(self, s, words):
+        """
+        :type s: str
+        :type words: List[str]
+        :rtype: List[int]
+        """
+        if len(words) == 0: return []
+        length = len(words[0])
+        if len(s) < length * len(words): return []
+
+        wordCount = {} # words中每个不同单词的出现次数
+        for w in words:
+            wordCount[w] = wordCount.get(w, 0) + 1
+
+        result = []
+        for i in range(length):
+            if i + length * len(words) > len(s): break
+            answers = {}
+            start = i
+            cur = i
+            while start + length * len(words) <= len(s):
+                w = s[cur:cur + length]
+                if w not in wordCount:
+                    # 验证失败，且[start, cur]中间的数（与start对于length同余）都会失败
+                    cur += length
+                    start = cur
+                    answers = {}
+                    continue
+
+                answers[w] = answers.get(w, 0) + 1
+                cur += length
+                while answers[w] > wordCount[w]:
+                    # 验证失败
+                    head = s[start:start + length]
+                    answers[head] -= 1
+                    start += length
+                    # 执行这个while以后以下的cur肯定不成立
+
+                if cur == start + length * len(words):
+                    # 验证成功
+                    result.append(start)
+                    head = s[start:start + length]
+                    answers[head] -= 1
+                    start += length
+
+        return result
+
 
 '''
 以下方法仅适用于words里面的单词长度一样，递归求解，92 ms
